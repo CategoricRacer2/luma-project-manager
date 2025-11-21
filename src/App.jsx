@@ -25,7 +25,7 @@ import {
  */
 
 // CAMBIA ESTO POR EL NOMBRE DE TU ARCHIVO EN LA CARPETA PUBLIC:
-const lumaLogoUrl = "/upscalemedia-transformed.png";
+const lumaLogoUrl = "/logo.png"; 
 
 // (La URL anterior queda aquí como respaldo por si acaso)
 // const lumaLogoUrl = "https://i.ibb.co/P4yrdDQ/upscalemedia-transformed.png"; 
@@ -268,18 +268,39 @@ const initialProjectsData = [
   }
 ];
 
-// --- MODAL COMPONENT FOR EXPORT/IMPORT ---
+// --- COMPONENTES ---
+
 const ShareModal = ({ isOpen, onClose, data, onImport }) => {
-  const [activeTab, setActiveTab] = useState('export'); // 'export' | 'import' | 'email'
+  const [activeTab, setActiveTab] = useState('export'); 
   const [importText, setImportText] = useState('');
   const [copySuccess, setCopySuccess] = useState('');
 
   if (!isOpen) return null;
 
-  // Generate export string (Base64 encoded JSON for a cleaner look)
-  const exportString = btoa(JSON.stringify(data));
+  // SOLUCIÓN DE CARACTERES ESPECIALES:
+  // Usamos encodeURIComponent para manejar tildes y emojis antes de base64 (btoa)
+  // y decodeURIComponent después de base64 (atob) para importar.
+  const safeEncode = (str) => {
+    try {
+      return btoa(unescape(encodeURIComponent(str)));
+    } catch (e) {
+      console.error("Error encoding string", e);
+      return "";
+    }
+  };
+
+  const safeDecode = (str) => {
+    try {
+      return decodeURIComponent(escape(atob(str)));
+    } catch (e) {
+      console.error("Error decoding string", e);
+      return null;
+    }
+  };
+
+  // Solo calculamos el string de exportación cuando el modal está abierto y se va a usar
+  const exportString = safeEncode(JSON.stringify(data));
   
-  // Generate Email Text
   const generateEmailText = () => {
     const projects = data.filter(p => p.category === 'Project').sort((a,b) => a.priority - b.priority);
     const shortProjects = data.filter(p => p.category === 'Short-Project').sort((a,b) => a.priority - b.priority);
@@ -299,15 +320,22 @@ const ShareModal = ({ isOpen, onClose, data, onImport }) => {
   };
 
   const handleImportSubmit = () => {
+    if (!importText) return;
+    
     try {
-      const parsedData = JSON.parse(atob(importText));
+      // Intentamos decodificar
+      const decodedString = safeDecode(importText);
+      if (!decodedString) throw new Error("Fallo en decodificación");
+
+      const parsedData = JSON.parse(decodedString);
       if (Array.isArray(parsedData) && parsedData.length > 0) {
         onImport(parsedData);
         onClose();
       } else {
-        alert('El código no es válido.');
+        alert('El código no parece válido o está vacío.');
       }
     } catch (e) {
+      console.error(e);
       alert('Error al leer el código. Asegúrate de copiar todo el texto generado.');
     }
   };
@@ -327,24 +355,15 @@ const ShareModal = ({ isOpen, onClose, data, onImport }) => {
 
         {/* Tabs */}
         <div className="flex border-b border-gray-100">
-          <button 
-            onClick={() => setActiveTab('export')}
-            className={`flex-1 py-3 text-sm font-medium transition-colors ${activeTab === 'export' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50' : 'text-gray-500 hover:bg-gray-50'}`}
-          >
-            Exportar Estado
-          </button>
-          <button 
-            onClick={() => setActiveTab('import')}
-            className={`flex-1 py-3 text-sm font-medium transition-colors ${activeTab === 'import' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50' : 'text-gray-500 hover:bg-gray-50'}`}
-          >
-            Importar Estado
-          </button>
-          <button 
-            onClick={() => setActiveTab('email')}
-            className={`flex-1 py-3 text-sm font-medium transition-colors ${activeTab === 'email' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50' : 'text-gray-500 hover:bg-gray-50'}`}
-          >
-            Texto Email
-          </button>
+          {['export', 'import', 'email'].map((tab) => (
+            <button 
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 py-3 text-sm font-medium transition-colors ${activeTab === tab ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50' : 'text-gray-500 hover:bg-gray-50'}`}
+            >
+              {tab === 'export' ? 'Exportar' : tab === 'import' ? 'Importar' : 'Texto Email'}
+            </button>
+          ))}
         </div>
 
         {/* Content */}
