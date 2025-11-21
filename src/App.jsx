@@ -25,7 +25,7 @@ import {
  */
 
 // CAMBIA ESTO POR EL NOMBRE DE TU ARCHIVO EN LA CARPETA PUBLIC:
-const lumaLogoUrl = "/logo.png"; 
+const lumaLogoUrl = "/upscalemedia-transformed.png";
 
 // (La URL anterior queda aquí como respaldo por si acaso)
 // const lumaLogoUrl = "https://i.ibb.co/P4yrdDQ/upscalemedia-transformed.png"; 
