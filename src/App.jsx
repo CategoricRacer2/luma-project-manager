@@ -17,9 +17,18 @@ import {
   AlertTriangle
 } from 'lucide-react';
 
-// --- RECURSOS ---
-// URL directa al logo (optimizado para fondo oscuro)
-const lumaLogoUrl = "https://i.ibb.co/P4yrdDQ/upscalemedia-transformed.png"; 
+/**
+ * --- CONFIGURACIÓN DE LOGO (CARPETA PUBLIC) ---
+ * 1. Guarda tu imagen (ej. 'logo.png') dentro de la carpeta llamada 'public'.
+ * 2. Simplemente escribe el nombre del archivo con una barra adelante "/" en la variable de abajo.
+ * * Ejemplo: Si el archivo es 'public/logo-luma.png', la url es '/logo-luma.png'
+ */
+
+// CAMBIA ESTO POR EL NOMBRE DE TU ARCHIVO EN LA CARPETA PUBLIC:
+const lumaLogoUrl = "/upscalemedia-transformed.png";
+
+// (La URL anterior queda aquí como respaldo por si acaso)
+// const lumaLogoUrl = "https://i.ibb.co/P4yrdDQ/upscalemedia-transformed.png"; 
 
 // --- DATOS DE LOS PROYECTOS (Información detallada del PDF) ---
 const initialProjectsData = [
