@@ -851,5 +851,3 @@ export default function LumaProjectManager() {
     </div>
   );
 }
-  );
-}
