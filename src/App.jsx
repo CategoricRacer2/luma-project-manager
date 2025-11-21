@@ -10,14 +10,18 @@ import {
   Layout, 
   GripVertical,
   Download,
-  Upload,
   Share2,
   Copy,
   Check,
-  X
+  X,
+  AlertTriangle
 } from 'lucide-react';
 
-// --- DATOS DE LOS PROYECTOS ---
+// --- RECURSOS ---
+// URL directa al logo (optimizado para fondo oscuro)
+const lumaLogoUrl = "https://i.ibb.co/P4yrdDQ/upscalemedia-transformed.png"; 
+
+// --- DATOS DE LOS PROYECTOS (Información detallada del PDF) ---
 const initialProjectsData = [
   // --- PROJECTS ---
   {
@@ -25,9 +29,13 @@ const initialProjectsData = [
     title: "Generación de Contratos + Firma Digital",
     category: "Project",
     hours: "40-60",
-    objective: "Pasar de un proceso manual a un circuito digital completo: creación, envío, firma y archivado desde Salesforce.",
-    impact: "Cierra contratos más rápido, mejora experiencia del cliente y reduce trabajo administrativo.",
-    scope: ["Plantillas Adobe/DocuSign vinculadas a Salesforce", "Integración Salesforce-Firma", "Almacenamiento automático del PDF"],
+    objective: "Pasar de un proceso manual (Word, imprimir, escanear) a un circuito digital completo: creación, envío, firma y archivado del contrato desde Salesforce. Reducir fricción para el cliente y tiempos internos del equipo comercial.",
+    impact: "Cierra contratos más rápido, disminuye el 'ciclo de venta → contrato firmado'. Mejora la experiencia del cliente (no tiene que imprimir, firmar, escanear). Menos trabajo administrativo (búsqueda de versiones, carga manual de archivos).",
+    scope: [
+      "Plantillas de contrato en Adobe (o herramienta de firma) vinculadas a datos de Salesforce (merge fields).",
+      "Integración Salesforce ↔ Adobe.",
+      "Almacenamiento automático del PDF firmado en el contrato (Files / adjuntos relacionados)."
+    ],
     priority: 1
   },
   {
@@ -35,9 +43,14 @@ const initialProjectsData = [
     title: "Proyecto Facturación Interna",
     category: "Project",
     hours: "40-50",
-    objective: "Dashboard integral de facturación interna (Comisiones Luma, Co-agents, Facturación por proveedor).",
-    impact: "Claridad sobre rentabilidad real y foco comercial.",
-    scope: ["Dashboards Visión General", "Por Proveedor", "Por Producto", "Por Co-agent"],
+    objective: "Tener un dashboard integral de facturación interna, enfocándose en: Comisiones de Luma, Comisiones de co-agents y Facturación general por proveedor y por producto principal.",
+    impact: "Claridad sobre rentabilidad real por proveedor, producto principal y co-agent. Ayuda a decidir dónde poner foco comercial (qué combos proveedor/producto/co-agent convienen más).",
+    scope: [
+      "Dashboards Visión General.",
+      "Dashboards Por proveedor.",
+      "Dashboards Por producto principal.",
+      "Dashboards Por co-agent."
+    ],
     priority: 2
   },
   {
@@ -45,9 +58,13 @@ const initialProjectsData = [
     title: "Formularios Sincronizados con Salesforce",
     category: "Project",
     hours: "30-40",
-    objective: "Canal estructurado para carga de reclamos mediante formulario directo a Case.",
-    impact: "Imagen profesional para el cliente, información estandarizada interna.",
-    scope: ["Diseño de formulario", "Integración a Salesforce", "Notificaciones internas"],
+    objective: "Crear un canal estructurado para que el cliente pueda cargar reclamos mediante un formulario y que eso entre directo a Salesforce (Case).",
+    impact: "El cliente tiene una forma clara, ordenada y profesional de levantar reclamos (no solo mails sueltos). Información estandarizada para el equipo.",
+    scope: [
+      "Diseño del formulario de reclamo.",
+      "Integración formulario → Salesforce.",
+      "Notificaciones internas al recibir un reclamo."
+    ],
     priority: 3
   },
   {
@@ -55,19 +72,29 @@ const initialProjectsData = [
     title: "Mensajes Automatizados para Clientes",
     category: "Project",
     hours: "30-40",
-    objective: "Automatizar comunicaciones estándar en distintos momentos del ciclo de vida.",
-    impact: "Cliente acompañado sin dependencia manual, mayor tasa de respuesta.",
-    scope: ["Definir momentos clave", "Implementación en Salesforce", "Plantillas de email"],
+    objective: "Definir y automatizar una serie de comunicaciones estándar al cliente (emails/recordatorios) en distintos momentos del ciclo de vida.",
+    impact: "El cliente se siente acompañado, informado y cuidado sin depender de que alguien se acuerde manualmente. Menos riesgo de 'dejar morir' relaciones por falta de contacto. Mayor tasa de respuesta a cotizaciones y encuestas.",
+    scope: [
+      "Definir los momentos clave.",
+      "Definir tipo de mensajes.",
+      "Implementación en Salesforce.",
+      "Plantillas de email."
+    ],
     priority: 4
   },
   {
     id: 'p5',
-    title: "Encuestas Personalizadas",
+    title: "Encuestas Personalizadas para Clientes",
     category: "Project",
     hours: "30-40",
-    objective: "Recopilar feedback estructurado (postventa, satisfacción, etc.).",
-    impact: "Detectar puntos fuertes/débiles. Base para Customer Experience.",
-    scope: ["Definición de encuestas", "Integración herramienta", "Dashboards de resultados"],
+    objective: "Recopilar feedback estructurado del cliente en distintos momentos (postventa, fin de contrato, satisfacción general, conocer fecha de cumpleaños, etc.).",
+    impact: "Detectar puntos fuertes y débiles del servicio. Base para el futuro Departamento de Customer Experience.",
+    scope: [
+      "Definición de tipos de encuesta.",
+      "Herramienta: integración con alguna plataforma de encuestas o construcción dentro del ecosistema.",
+      "Vincular respuestas a la Account.",
+      "Dashboards básicos de resultados."
+    ],
     priority: 5
   },
   {
@@ -75,9 +102,13 @@ const initialProjectsData = [
     title: "Creación de un Perfil de Cliente",
     category: "Project",
     hours: "30-40",
-    objective: "Vista unificada: comportamiento, histórico, tipo de relación.",
-    impact: "Priorizar acciones comerciales y mejor segmentación.",
-    scope: ["Definir campos del perfil", "Implementar layout", "Scoring/Categorías"],
+    objective: "Construir una vista unificada del perfil de cada cliente: comportamiento, histórico de negocios, respuesta, tipo de relación, etc.",
+    impact: "Permite priorizar acciones comerciales sobre clientes con mayor potencial y/o mejor comportamiento. Mejor segmentación para campañas, encuestas, acciones de retención, etc.",
+    scope: [
+      "Definir qué información forma parte del 'Perfil de Cliente'.",
+      "Implementar un layout específico.",
+      "Posiblemente algunos campos calculados (scores, categorías)."
+    ],
     priority: 6
   },
   {
@@ -85,9 +116,14 @@ const initialProjectsData = [
     title: "Customer Experience Department",
     category: "Project",
     hours: "30-40",
-    objective: "Diseñar modelo de CX en Salesforce con métricas, procesos y roles.",
-    impact: "Gestión de experiencia a largo plazo, decisiones basadas en LTV.",
-    scope: ["Lifetime Value", "Survey clientes", "Servicio PostVenta (Rol)"],
+    objective: "Diseñar y soportar en Salesforce el modelo para un Departamento de Customer Experience, no solo como 'idea', sino con métricas, procesos y roles.",
+    impact: "Ordena cómo se gestiona la experiencia del cliente a lo largo del tiempo, no solo en un momento. Abre la puerta a decisiones basadas en Lifetime Value, satisfacción real, recurrencia, etc.",
+    scope: [
+      "Cálculo de Lifetime value de cada cuenta.",
+      "Registro de 'Qué es lo que más les gusta del servicio'.",
+      "Survey para clientes.",
+      "Servicio PostVenta con nuevo rol."
+    ],
     priority: 7
   },
   {
@@ -95,9 +131,14 @@ const initialProjectsData = [
     title: "Quote Creation Based on Emails",
     category: "Project",
     hours: "30-40",
-    objective: "Integrar Salesforce con email para seguimiento de cotizaciones.",
-    impact: "Mayor tasa de cierre, no perder cotizaciones antiguas.",
-    scope: ["Integración email", "Automatización", "Reporte de cotizaciones"],
+    objective: "Mejorar el seguimiento de cotizaciones que se envían por email, integrando mejor Salesforce con el correo y teniendo visibilidad clara de qué se cotizó y a quién.",
+    impact: "Mayor tasa de cierre por mejor seguimiento de cotizaciones. Menos riesgo de perder de vista una cotización antigua que podría reactivarse.",
+    scope: [
+      "Investigar y definir la integración con email.",
+      "Posible automatización.",
+      "Ajustar las notificaciones ya existentes para integrarlas con este seguimiento.",
+      "Reporte: Cotizaciones enviadas, sin respuesta, ganadas, perdidas."
+    ],
     priority: 8
   },
   {
@@ -105,9 +146,13 @@ const initialProjectsData = [
     title: "Proyecto Data Quality",
     category: "Project",
     hours: "30-40",
-    objective: "Monitoreo de calidad de datos para corregir errores en objetos clave.",
-    impact: "Mejora dashboards y decisiones. Evita conclusiones erróneas.",
-    scope: ["Reglas de calidad", "Dashboards Data Quality", "Validaciones de bloqueo"],
+    objective: "Crear una capa de monitoreo de calidad de datos, para detectar y corregir errores de carga en objetos clave.",
+    impact: "Mejora todo lo demás: dashboards, métricas, decisiones. Evita conclusiones equivocadas por datos mal cargados.",
+    scope: [
+      "Definir reglas de calidad por objeto.",
+      "Creación de dashboards de Data Quality.",
+      "Validaciones adicionales o flows que bloqueen las inconsistencias más graves."
+    ],
     priority: 9
   },
   {
@@ -115,9 +160,15 @@ const initialProjectsData = [
     title: "Life Cycle Stage (Accounts)",
     category: "Project",
     hours: "30-40",
-    objective: "Clasificar cuentas según etapa de vida y tipo (Importer/Supplier).",
-    impact: "Campañas y mensajes segmentados correctamente.",
-    scope: ["Definir etapas y reglas", "Campos en Account", "Automatización de cambios de etapa"],
+    objective: "Clasificar las cuentas según su etapa de vida (posible cliente, cliente activo, ex-cliente, etc.) y tipo (Importer / Supplier), para segmentar y comunicar mejor.",
+    impact: "Campañas y mensajes adaptados a la etapa y tipo de cliente. Enfocar esfuerzos comerciales correctamente.",
+    scope: [
+      "Definir las etapas de Life Cycle.",
+      "Definir las reglas de cada etapa (basadas en oportunidades, contratos, tiempo sin actividad, etc.).",
+      "Crear campos en Account: Life Cycle Stage + tipo (Importer/Supplier).",
+      "Flujos o procesos que actualicen automáticamente la etapa según los datos.",
+      "Segmentación posterior para campañas e informes."
+    ],
     priority: 10
   },
   {
@@ -125,9 +176,13 @@ const initialProjectsData = [
     title: "Proyecto Métricas Logística II",
     category: "Project",
     hours: "20-35",
-    objective: "KPIs específicos para tiempos logísticos (Packing materials, Docs embarque).",
-    impact: "Medir eficiencia y detectar cuellos de botella.",
-    scope: ["Campos de fecha", "Cálculo de días", "Dashboard logístico"],
+    objective: "Incorporar dos KPIs específicos para mejorar el control de tiempos logísticos: 1) Tiempo entre inicio de contrato y confirmación de packing materials. 2) Tiempo entre carga y envío de documentos de embarque.",
+    impact: "Mide eficiencia del proceso logístico. Detecta cuellos de botella.",
+    scope: [
+      "Campos de fecha: documentos cargados vs. documentos enviados.",
+      "Cálculo de días de diferencia.",
+      "Dashboard logístico."
+    ],
     priority: 11
   },
 
@@ -137,39 +192,55 @@ const initialProjectsData = [
     title: "Inteligencia de Proveedores y Cuentas",
     category: "Short-Project",
     hours: "15-20",
-    objective: "Vista 360: respuesta, potencial y estado comercial.",
-    impact: "Identificar proveedores valiosos y cuentas con 'vida' comercial.",
-    scope: ["Tiempo respuesta en Cases", "Dashboard potencial", "Flags de Contrato/Oportunidad"],
+    objective: "Dar una vista 360 de proveedores y cuentas: tiempo de respuesta, valor potencial y estado comercial (contratos/oportunidades), para tomar decisiones y priorizar esfuerzos.",
+    impact: "Permite saber qué proveedores valen la pena (responden rápido y mueven buen potencial). Da visibilidad rápida de en qué cuentas hay 'vida' comercial (contratos y oportunidades abiertas). Mejora la segmentación y reporting de contactos y cuentas.",
+    scope: [
+      "Tiempo promedio de respuesta en cases del proveedor en Account.",
+      "Dashboard con velocidad de respuesta de proveedores.",
+      "High-Value Potential según Potential Amount.",
+      "Campo 'tiene contrato abierto' (Account/Contract) y 'tiene oportunidad abierta'.",
+      "Flow Contact Source.",
+      "Dashboard: cantidad por año de nuevos proveedores, importadores y aliados."
+    ],
     priority: 1
   },
   {
     id: 'sp2',
-    title: "Seguimiento Post-Shipping",
+    title: "Seguimiento Post-Shipping y Relación con Nuevos Clientes",
     category: "Short-Project",
     hours: "10-15",
-    objective: "Mejorar experiencia post-embarque y preparar info para retención.",
-    impact: "Soporte proactivo, cliente no olvidado.",
-    scope: ["Alerta 15 días post ETA", "Reporte para clientes con reservas"],
+    objective: "Mejorar la experiencia posterior al embarque, especialmente para nuevos clientes o productos nuevos, y preparar la información para futuras ventas y retención.",
+    impact: "Te asegura que nadie 'se olvida' de preguntar cómo les fue con el producto. Te da un soporte listo para enviar info clara al cliente.",
+    scope: [
+      "Alerta 15 días posteriores a ETA (Shipping News). (Distinto a mail).",
+      "Reporte para clientes con contratos y productos reservados."
+    ],
     priority: 2
   },
   {
     id: 'sp3',
-    title: "Modelo de Datos Cases y Sanitary Registers",
+    title: "Modelo de Datos y UX en Cases y Sanitary Registers",
     category: "Short-Project",
     hours: "10-15",
-    objective: "Ordenar modelo de datos y mejorar usabilidad de Case.",
-    impact: "Trabajo diario más rápido, mejor trazabilidad.",
-    scope: ["Búsqueda en Sanitary Reg.", "Objeto intermedio Case-Sanitary"],
+    objective: "Ordenar el modelo de datos relacionado con Sanitary Registers y Cases, y mejorar la usabilidad del objeto Case para un seguimiento detallado.",
+    impact: "Hacen más rápido el trabajo diario. Mejoran la trazabilidad y cumplimiento (registros sanitarios + casos). Permiten medir tiempos de respuesta en casos (complementa la lógica del proveedor).",
+    scope: [
+      "Búsqueda en Sanitary Registers.",
+      "Crear Objeto intermedio Case Sanitary Registers."
+    ],
     priority: 3
   },
   {
     id: 'sp4',
-    title: "Control Comisiones y Debit Note",
+    title: "Control de Comisiones y Trazabilidad Debit Note",
     category: "Short-Project",
     hours: "10-15",
-    objective: "Asegurar cálculo correcto de comisiones y estado de Debit Notes.",
-    impact: "Control financiero, confianza en números.",
-    scope: ["Campo 'Remaining Commission'", "Trazabilidad Debit Note"],
+    objective: "Asegurar que las comisiones estén correctamente calculadas y visibles, y que haya claridad sobre el estado de Debit Notes y embarques.",
+    impact: "Alto en control financiero y confianza en los números, sobre todo para managment. Si las comisiones están mal o confusas, se genera ruido interno muy rápido.",
+    scope: [
+      "Nuevo campo fórmula 'Remaining Commission'.",
+      "Debit Note y trazabilidad."
+    ],
     priority: 4
   },
   {
@@ -177,9 +248,13 @@ const initialProjectsData = [
     title: "Analítica, Comunicación y Documentación",
     category: "Short-Project",
     hours: "10-15",
-    objective: "Ordenar capa de reporting interno y externo.",
-    impact: "Alineación interna e imagen externa actualizada.",
-    scope: ["Dashboard Sales", "Documentación explicativa", "Publicaciones Web"],
+    objective: "Ordenar la capa de reporting y comunicación, tanto interna (dashboards, documento explicativo) como externa (web).",
+    impact: "Alineación interna (todos mirando el mismo dashboard y entendiéndolo). Imagen externa (web actualizada con contenido reciente).",
+    scope: [
+      "Dashboard Sales: Nuevos productos + Otras métricas comerciales que definan.",
+      "Documento de explicación del Dashboard de Ventas.",
+      "Publicaciones web desde LinkedIn."
+    ],
     priority: 5
   }
 ];
@@ -344,7 +419,7 @@ const ProjectCard = ({
   onDragStart, 
   onDragOver, 
   onDrop,
-  isDragging 
+  isDragging
 }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -407,7 +482,7 @@ const ProjectCard = ({
             </div>
           </div>
 
-          {/* Main Content Header */}
+          {/* Main Content Header - Clickable Area for Expand */}
           <div className="flex-1 cursor-pointer group" onClick={() => setExpanded(!expanded)}>
             <div className="flex items-center gap-2 mb-1">
               <span className={`text-xs font-medium px-2 py-0.5 rounded-full transition-transform duration-300 group-hover:scale-105 ${badgeColor}`}>
@@ -437,6 +512,7 @@ const ProjectCard = ({
         >
           <div className="overflow-hidden">
             <div className="pt-2 border-t border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-4">
+              
               <div className="col-span-1 md:col-span-3 bg-gray-50 p-4 rounded-lg border border-gray-100">
                 <h4 className="text-sm font-bold text-gray-700 flex items-center gap-2 mb-2">
                   <Target size={16} className="text-red-500" /> Objetivo
@@ -618,10 +694,36 @@ export default function LumaProjectManager() {
   const shortProjectsList = sortByPriority(projectsData.filter(p => p.category === 'Short-Project'));
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 p-4 md:p-8 selection:bg-blue-100 selection:text-blue-900">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 selection:bg-blue-100 selection:text-blue-900">
+      
+      {/* DARK BRANDING HEADER with LOGO */}
+      <div className="bg-slate-900 py-5 px-4 md:px-8 shadow-lg relative overflow-hidden">
+         {/* Background Pattern subtle effect */}
+         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_1px_1px,_#ffffff_1px,_transparent_0)] bg-[length:20px_20px]"></div>
+         
+         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
+           <div className="flex items-center gap-6">
+             {/* Logo Container with glow effect */}
+             <div className="bg-white/10 p-3 rounded-xl backdrop-blur-sm border border-white/20 shadow-inner">
+               <img 
+                 src={lumaLogoUrl} 
+                 alt="Luma Logo" 
+                 className="h-16 w-auto object-contain drop-shadow-md" // Aumentado de h-10 a h-16
+               />
+             </div>
+             <div>
+                <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight mb-1">
+                  Roadmap Estratégico
+                </h1>
+                <p className="text-blue-200 text-sm font-medium">Portal de Gestión de Proyectos Salesforce</p>
+             </div>
+           </div>
+         </div>
+       </div>
+
+      <div className="max-w-6xl mx-auto p-4 md:p-8">
         
-        {/* MODAL */}
+        {/* MODALS */}
         <ShareModal 
           isOpen={isShareModalOpen} 
           onClose={() => setIsShareModalOpen(false)}
@@ -629,45 +731,42 @@ export default function LumaProjectManager() {
           onImport={handleImportData}
         />
 
-        {/* Header */}
-        <header className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 animate-fadeIn">
+        {/* Controls Header */}
+        <header className="mb-8 mt-4 flex flex-col md:flex-row justify-between items-center gap-6 animate-fadeIn bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
           <div>
-            <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-2">
-              Luma <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Roadmap</span>
-            </h1>
-            <p className="text-slate-500 max-w-xl text-lg leading-relaxed">
-              Priorización estratégica de consultoría Salesforce. 
-              Arrastra las tarjetas para reordenar.
+            <p className="text-slate-500 text-base leading-relaxed flex items-center gap-2">
+              <GripVertical size={18} className="text-slate-400 inline"/>
+              Arrastra y suelta las tarjetas para definir la prioridad estratégica.
             </p>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
              {/* Share Button */}
             <button
               onClick={() => setIsShareModalOpen(true)}
-              className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:text-blue-600 transition-all"
+              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:text-blue-600 transition-all w-full sm:w-auto"
             >
               <Share2 size={16} /> Exportar / Importar
             </button>
 
-            <div className="flex bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm">
+            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200/50 w-full sm:w-auto">
               <button 
                 onClick={() => setActiveTab('all')}
-                className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === 'all' ? 'bg-slate-100 text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
+                className={`flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
               >
                 Todo
               </button>
               <button 
                 onClick={() => setActiveTab('projects')}
-                className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === 'projects' ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
+                className={`flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === 'projects' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
               >
                 Proyectos
               </button>
               <button 
                 onClick={() => setActiveTab('short')}
-                className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === 'short' ? 'bg-emerald-50 text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'}`}
+                className={`flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === 'short' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
               >
-                Short Projects
+                Shorts
               </button>
             </div>
           </div>
@@ -750,5 +849,7 @@ export default function LumaProjectManager() {
         </div>
       </div>
     </div>
+  );
+}
   );
 }
